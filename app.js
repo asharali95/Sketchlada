@@ -1,23 +1,11 @@
 const express = require("express");
-const Art = require("./models/artModel");
+const artRouter = require("./routes/artRoutes");
 
 const app = express();
 
-app.use(express.json()); //middleware
+//middleware
+app.use(express.json());
 
-app.post("/api/v1/art", async (req, res) => {
-  try {
-    console.log("art called");
-    var art = await Art.create(req.body);
-    console.log(art);
-    res.status(200).json({
-      status:"success",
-      data:{
-          art
-      }
-    });
-  } catch (error) {
-    console.log(error);
-  }
-});
+//routers
+app.use("/api/v1/arts", artRouter);
 module.exports = app;

@@ -13,12 +13,6 @@ mongoose
     console.log("connected to mongoDB");
   });
 
-// Art.create({
-//   title: "my first art",
-//   rate: 4,
-//   cost: 45,
-// });
-
 app.listen(8000, () => {
   console.log("server running at 8000");
 });
