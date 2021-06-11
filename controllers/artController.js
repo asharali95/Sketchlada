@@ -20,12 +20,13 @@ exports.addArt = async (req, res) => {
 exports.getArts = async (req, res) => {
   try {
     // modelled query
-    var queryStr = JSON.stringify(req.query);
+    var { role, moreData, ...resQueries } = req.query;
+    var queryStr = JSON.stringify(resQueries);
     var query = queryStr.replace(
-      /\b(gt|lt|gte|lte)\b/g,
+      /\b(gt|lt|gte|lte|in)\b/g,
       (match) => `$${match}`
     );
-    var queryObj = JSON.parse(query)
+    var queryObj = JSON.parse(query);
     //passed query
     var arts = await Art.find(queryObj);
 
