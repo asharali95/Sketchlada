@@ -20,18 +20,34 @@ exports.addArt = async (req, res) => {
 exports.getArts = async (req, res) => {
   try {
     // modelled query
-    var { role, moreData, sort, ...resQueries } = req.query;
+    var { sort, fields,...resQueries } = req.query;
     // 1- filtering
+
     var queryStr = JSON.stringify(resQueries);
     var query = queryStr.replace(
       /\b(gt|lt|gte|lte|in)\b/g,
       (match) => `$${match}`
     );
     var queryObj = JSON.parse(query);
+    var query = Art.find(queryObj);
     //2- sorting
+      if(sort){
+        sort = sort.split(",").join(" ")
+        console.log(sort)
+        query = query.sort(sort);
+      }
+      else{
+        query = query.sort("createdAt"); // default sort condition
+      }
+      // field limiting 
+      if(fields){
+        fields = fields.split(",").join(" ")
+        query = query.select(fields)
+      }
+    //get  
+    var arts = await query;
 
-    var arts = await Art.find(queryObj).sort(sort);
-
+    
     res.status(200).json({
       status: "success",
       results: arts.length,
