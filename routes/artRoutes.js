@@ -5,4 +5,5 @@ const router = express.Router();
 
 router.post("/", addArt);
 router.get("/",getArts);
+
 module.exports = router;
