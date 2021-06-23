@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, "this is my custom error message"],
+    unique: true,
   },
   email: {
     type: String,
@@ -29,6 +31,15 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// encrypting password before saving in database
+userSchema.pre("save", async function (next) {
+  //TODO: check if password change then do the following
+  if (!this.isModified("password")) return next();
+  var encryptedPassword = await bcrypt.hash(this.password, 12); //number for brute force attack
+  this.password = encryptedPassword;
+  this.confirmPassword = undefined;
+  next();
+});
 var User = new mongoose.model("User", userSchema);
 
 module.exports = User;

@@ -3,7 +3,6 @@ const User = require("../models/userModel");
 exports.signup = async (req, res) => {
   try {
     var user = await User.create(req.body);
-    console.log(user);
     res.status(200).json({
       status: "success",
       data: {
