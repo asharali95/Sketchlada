@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minLength: 8,
-    select: false // ab yeh kisi bhi API request pe data k sath ni fetch hoga
+    select: false, // ab yeh kisi bhi API request pe data k sath ni fetch hoga
   },
   confirmPassword: {
     type: String,
@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema({
     ],
   },
 });
+
+//model instance method -> this method will be available for all the documents created via this model
+userSchema.methods.passwordVerification = async (password, hashedPassword) => {
+  return await bcrypt.compare(password, hashedPassword);
+};
 
 // encrypting password before saving in database
 userSchema.pre("save", async function (next) {
