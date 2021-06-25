@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minLength: 8,
+    select: false // ab yeh kisi bhi API request pe data k sath ni fetch hoga
   },
   confirmPassword: {
     type: String,
