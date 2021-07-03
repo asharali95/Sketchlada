@@ -101,6 +101,7 @@ exports.protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
+    console.log(token);
 
     //2- if no token exists
     if (!token) {
@@ -109,7 +110,6 @@ exports.protect = async (req, res, next) => {
         message: "please sign in!",
       });
     }
-
     //3- verify
     var { id: userId, iat: tokenIssuedAt } = await promisify(JWT.verify)(
       token,
@@ -124,7 +124,7 @@ exports.protect = async (req, res, next) => {
       });
     }
     var passwordChangedAt = user.passwordChangedAt;
-    if (!passwordChangedAt) {
+    if (passwordChangedAt) {
       var isPasswordChangedAfter =
         passwordChangedAt.getTime() > tokenIssuedAt * 1000;
       if (isPasswordChangedAfter) {
@@ -144,3 +144,14 @@ exports.protect = async (req, res, next) => {
     });
   }
 };
+
+exports.restrictTo =
+  (...roles) =>
+  async (req, res) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(401).json({
+        status: "error",
+        error: "you donot have access to perform this action",
+      });
+    }
+  };

@@ -1,10 +1,10 @@
 const express = require("express");
 const { addArt, getArts } = require("../controllers/artController");
-const { protect } = require("../controllers/authController");
+const { protect, restrictTo } = require("../controllers/authController");
 
 const router = express.Router();
 
-router.post("/", protect, addArt);
-router.get("/", getArts); 
+router.get("/", getArts);
+router.post("/", protect, restrictTo("artist"), addArt);
 
 module.exports = router;
