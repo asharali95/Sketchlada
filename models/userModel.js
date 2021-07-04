@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -36,13 +37,30 @@ const userSchema = new mongoose.Schema({
     ],
   },
   passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetTokenExpiredAt: Date,
 });
 
 //model instance method -> this method will be available for all the documents created via this model
 userSchema.methods.passwordVerification = async (password, hashedPassword) => {
   return await bcrypt.compare(password, hashedPassword);
 };
-
+// password reset token generator
+userSchema.methods.passwordResetTokenGenerator = function () {
+  //generate random string of 32 bits
+  var resetToken = crypto.randomBytes(32).toString("hex");
+  //encrypt reset token
+  var encryptedResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  //save encrypted resettoken in user document
+  this.passwordResetToken = encryptedResetToken;
+  //set token expiry(10 min)
+  this.passwordResetTokenExpiredAt = Date.now() + 10 * 60 * 1000;
+  //return non encrypted reset token
+  return resetToken;
+};
 // encrypting password before saving in database
 userSchema.pre("save", async function (next) {
   //TODO: check if password change then do the following
