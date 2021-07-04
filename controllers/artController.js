@@ -4,7 +4,6 @@ const APIFeatures = require("../utility/commonUtility");
 exports.addArt = async (req, res) => {
   try {
     var art = await Art.create(req.body);
-    console.log(art);
     res.status(200).json({
       status: "success",
       data: {

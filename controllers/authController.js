@@ -31,7 +31,6 @@ exports.signup = async (req, res) => {
     var { password, ...modifiedUser } = user.toObject(); //simple object
     //generate JWT
     var token = signJWT(user._id);
-    console.log(token);
     res.status(200).json({
       status: "success",
       token,
@@ -101,8 +100,7 @@ exports.protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    console.log(token);
-
+    
     //2- if no token exists
     if (!token) {
       return res.status(401).json({
