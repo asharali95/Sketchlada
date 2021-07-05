@@ -1,10 +1,25 @@
-const User = require("../models/userModel");
 const JWT = require("jsonwebtoken");
+const crypto = require("crypto");
+const User = require("../models/userModel");
 const { promisify } = require("util");
 const sendEmail = require("../utility/email");
+
 const signJWT = (userId) => {
   return JWT.sign({ id: userId }, process.env.JWT_WEB_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const createAndSendToken = (user, res) => {
+  var { password, ...modifiedUser } = user.toObject(); //Simple Object
+  //generate JWT
+  var token = signJWT(user._id);
+  res.status(200).json({
+    status: "success",
+    token,
+    data: {
+      user: modifiedUser,
+    },
   });
 };
 exports.fetchUsers = async (req, res) => {
@@ -28,16 +43,7 @@ exports.fetchUsers = async (req, res) => {
 exports.signup = async (req, res) => {
   try {
     var user = await User.create(req.body); // bson
-    var { password, ...modifiedUser } = user.toObject(); //simple object
-    //generate JWT
-    var token = signJWT(user._id);
-    res.status(200).json({
-      status: "success",
-      token,
-      data: {
-        modifiedUser,
-      },
-    });
+    createAndSendToken(user, res);
   } catch (error) {
     res.status(404).json({
       status: "error",
@@ -69,19 +75,7 @@ exports.login = async (req, res) => {
         error: "Invalid email or password",
       });
     }
-
-    //generate token
-    var token = signJWT(user._id);
-    //send response
-    var { password, ...modifiedUser } = user.toObject(); // removing password
-
-    res.status(200).json({
-      status: "sucess",
-      token,
-      data: {
-        user: modifiedUser,
-      },
-    });
+    createAndSendToken(user, res);
   } catch (error) {
     res.status(404).json({
       status: "error",
@@ -100,7 +94,7 @@ exports.protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    
+
     //2- if no token exists
     if (!token) {
       return res.status(401).json({
@@ -189,10 +183,36 @@ exports.forgotPassword = async (req, res) => {
 };
 exports.resetPassword = async (req, res) => {
   try {
-    res.status(200).json({
-      msg: "reset password",
+    var { token } = req.params;
+    var { password, confirmPassword } = req.body;
+    var encryptedResetToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    var user = await User.findOne({
+      passwordResetToken: encryptedResetToken,
+      passwordResetTokenExpiredAt: { $gt: Date.now() },
     });
+
+    if (!user) {
+      res.status(400).json({
+        status: "error",
+        msg: "token doesnt exist or has been expired!",
+      });
+    }
+    //set user new password
+    user.password = password;
+    user.confirmPassword = confirmPassword;
+    user.passwordResetToken = undefined;
+
+    await user.save();
+
+    //login user again(generating JWT token again)
+    createAndSendToken(user, res);
   } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetTokenExpiredAt = undefined;
+    await user.save({ validateBeforeSave: false });
     res.status(400).json({
       status: "error",
       msg: error.message,
