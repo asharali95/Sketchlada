@@ -69,7 +69,6 @@ userSchema.pre("save", async function (next) {
   this.password = encryptedPassword;
   this.confirmPassword = undefined;
   this.passwordChangedAt = Date.now() - 1000; //This is because JWT signing process takes time so we minus 1 second from actual time to prevent conflicts
-  
   next();
 });
 var User = new mongoose.model("User", userSchema);

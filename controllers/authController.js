@@ -1,5 +1,6 @@
 const JWT = require("jsonwebtoken");
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 const { promisify } = require("util");
 const sendEmail = require("../utility/email");
@@ -213,6 +214,58 @@ exports.resetPassword = async (req, res) => {
     user.passwordResetToken = undefined;
     user.passwordResetTokenExpiredAt = undefined;
     await user.save({ validateBeforeSave: false });
+    res.status(400).json({
+      status: "error",
+      msg: error.message,
+    });
+  }
+};
+
+//this api is still to work on:
+exports.updatePassword = async (req, res) => {
+  try {
+    var { currentPassword, newPassword, confirmPassword } = req.body;
+    var { id } = req.params;
+    var user = await User.findOne({ _id: id }).select("+password");
+    if (!user) {
+      res.status(400).json({
+        status: "error",
+        msg: "user doest not exist",
+      });
+    }
+
+    var { password, ...modifiedUser } = user.toObject();
+    // verify if current password does match
+    var passwordVerified = await user.passwordVerification(
+      currentPassword,
+      user.password
+    );
+
+    if (!passwordVerified) {
+      res.status(400).json({
+        status: "error",
+        msg: "current password does not match",
+      });
+    }
+    //check if current pass is equal to new password
+    if (currentPassword === newPassword) {
+      res.status(400).json({
+        status: "error",
+        msg: "password should be different from current one",
+      });
+    }
+    user.password = newPassword;
+    user.confirmPassword = confirmPassword;
+    await user.save();
+
+    //login user again(generating JWT token again)
+    createAndSendToken(user, res);
+
+    res.status(200).json({
+      status: "success",
+      msg: "update password",
+    });
+  } catch (error) {
     res.status(400).json({
       status: "error",
       msg: error.message,
