@@ -13,8 +13,18 @@ const signJWT = (userId) => {
 
 const createAndSendToken = (user, res) => {
   var { password, ...modifiedUser } = user.toObject(); //Simple Object
+
   //generate JWT
   var token = signJWT(user._id);
+
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + parseInt(process.env.COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000
+    ),
+    secure: process.env.NODE_ENV === "development" ? false : true, // this will only valid for HTTPS connection
+    httpOnly: true, // transfer only in http/https protocols
+  });
+  
   res.status(200).json({
     status: "success",
     token,
