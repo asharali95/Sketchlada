@@ -3,6 +3,7 @@ const APIFeatures = require("../utility/commonUtility");
 
 exports.addArt = async (req, res) => {
   try {
+    req.body.artist = req.user._id;
     var art = await Art.create(req.body);
     res.status(200).json({
       status: "success",
@@ -36,6 +37,83 @@ exports.getArts = async (req, res) => {
       results: arts.length,
       data: {
         arts,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error.message,
+    });
+  }
+};
+
+exports.getSpecificArt = async (req, res) => {
+  try {
+    var art = await Art.findById(req.params.artId);
+    res.status(200).json({
+      status: "success",
+      data: {
+        art,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error.message,
+    });
+  }
+};
+
+exports.likeArt = async (req, res) => {
+  try {
+    var { artId } = req.params;
+    var { _id: userId } = req.user;
+    var art = await Art.findOneAndUpdate(
+      {
+        _id: artId,
+        likes: { $ne: userId },
+      },
+      {
+        $inc: { likesCount: 1 },
+        $push: { likes: userId },
+      },
+      {
+        new: true,
+      }
+    );
+    console.log(req.params.artId);
+    res.status(200).json({
+      status: "success",
+      data: {
+        art,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error.message,
+    });
+  }
+};
+exports.dislikeArt = async (req, res) => {
+  try {
+    var { artId } = req.params;
+    var { _id: userId } = req.user;
+    var art = await Art.findOneAndUpdate(
+      {
+        _id: artId,
+        likes: userId,
+      },
+      {
+        $inc: { likesCount: -1 },
+        $pull: { likes: userId },
+      },
+      {
+        new: true,
+      }
+    );
+    console.log(req.params.artId);
+    res.status(200).json({
+      status: "success",
+      data: {
+        art,
       },
     });
   } catch (error) {
