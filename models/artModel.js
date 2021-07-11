@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
-
+const {
+  Schema: { ObjectId },
+} = require("mongoose");
 const artSchema = new mongoose.Schema(
   {
+    artist: ObjectId,
     title: String, // my first art
     description: String, //abc...
     cost: Number, //350

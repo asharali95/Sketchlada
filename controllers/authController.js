@@ -24,7 +24,7 @@ const createAndSendToken = (user, res) => {
     secure: process.env.NODE_ENV === "development" ? false : true, // this will only valid for HTTPS connection
     httpOnly: true, // transfer only in http/https protocols
   });
-  
+
   res.status(200).json({
     status: "success",
     token,
@@ -137,8 +137,8 @@ exports.protect = async (req, res, next) => {
         });
       }
     }
+    req.user = user;
     next();
-
     //5- check if user doesnt change password after signing token
   } catch (error) {
     res.status(404).json({
@@ -150,13 +150,14 @@ exports.protect = async (req, res, next) => {
 
 exports.restrictTo =
   (...roles) =>
-  async (req, res) => {
+  async (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return res.status(401).json({
         status: "error",
         error: "you donot have access to perform this action",
       });
     }
+    next();
   };
 
 exports.forgotPassword = async (req, res) => {
