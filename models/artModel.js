@@ -14,13 +14,6 @@ const artSchema = new mongoose.Schema(
     cost: Number, //350
     resolutionWidth: Number,
     resolutionHeight: Number,
-    reviews: [
-      {
-        content: String, //nice art!
-        reviewedBy: String, //123
-        rating: Number, //5
-      },
-    ],
     gallery: Array, //abc.com, xyz.com
     orientation: String, // landscape, portrait
     subject: String, //"nature"
@@ -32,9 +25,18 @@ const artSchema = new mongoose.Schema(
     },
   },
   {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
     timestamps: true,
   }
 );
+
+artSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "art",
+  localField: "_id",
+});
+
 artSchema.pre(/^find/, function (next) {
   //since it is query middleware, "this" represents query
   this.populate({

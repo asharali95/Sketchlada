@@ -48,7 +48,7 @@ exports.getArts = async (req, res) => {
 
 exports.getSpecificArt = async (req, res) => {
   try {
-    var art = await Art.findById(req.params.artId);
+    var art = await Art.findById(req.params.artId).populate("reviews");
     res.status(200).json({
       status: "success",
       data: {
