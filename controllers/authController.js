@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 const { promisify } = require("util");
 const sendEmail = require("../utility/email");
+const { addArtist, fetchArtist } = require("./artistController");
+const { addBuyer, fetchBuyer } = require("./buyerController");
 
 const signJWT = (userId) => {
   return JWT.sign({ id: userId }, process.env.JWT_WEB_SECRET, {
@@ -12,10 +14,8 @@ const signJWT = (userId) => {
 };
 
 const createAndSendToken = (user, res) => {
-  var { password, ...modifiedUser } = user.toObject(); //Simple Object
-
   //generate JWT
-  var token = signJWT(user._id);
+  var token = signJWT(user.userId);
 
   res.cookie("jwt", token, {
     expires: new Date(
@@ -29,7 +29,7 @@ const createAndSendToken = (user, res) => {
     status: "success",
     token,
     data: {
-      user: modifiedUser,
+      user,
     },
   });
 };
@@ -54,7 +54,17 @@ exports.fetchUsers = async (req, res) => {
 exports.signup = async (req, res) => {
   try {
     var user = await User.create(req.body); // bson
-    createAndSendToken(user, res);
+    console.log(user);
+    //profile creation
+    var profile = {
+      username: user.username,
+      email: user.email,
+      userId: user._id,
+    };
+    var userProfile = null;
+    if (user.role === "artist") var userProfile = await addArtist(profile);
+    if (user.role === "buyer") var userProfile = await addBuyer(profile);
+    createAndSendToken(userProfile, res);
   } catch (error) {
     res.status(404).json({
       status: "error",
@@ -86,7 +96,13 @@ exports.login = async (req, res) => {
         error: "Invalid email or password",
       });
     }
-    createAndSendToken(user, res);
+    console.log(user)
+    //fetching profile
+    var userProfile = null;
+    if (user.role === "artist") userProfile = await fetchArtist(user._id);
+    if (user.role === "buyer") userProfile = await fetchBuyer(user._id);
+    console.log(userProfile);
+    createAndSendToken(userProfile, res);
   } catch (error) {
     res.status(404).json({
       status: "error",

@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     required: [true, "role is required!"],
     enum: ["artist", "buyer"],
   },
+  displayPicture: {
+    type: String,
+    default: "default.png",
+  },
   email: {
     type: String,
     unique: true, // indexing
