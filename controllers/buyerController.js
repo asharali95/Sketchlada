@@ -2,7 +2,7 @@ var Buyer = require("../models/buyerModel");
 
 exports.fetchBuyer = async (buyerId) => {
   try {
-    var buyer = await Buyer.find({ userId: buyerId });
+    var buyer = await Buyer.findOne({ userId: buyerId });
     return buyer;
   } catch (error) {
     return new Error(error.message);

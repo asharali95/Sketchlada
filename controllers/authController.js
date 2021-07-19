@@ -54,7 +54,6 @@ exports.fetchUsers = async (req, res) => {
 exports.signup = async (req, res) => {
   try {
     var user = await User.create(req.body); // bson
-    console.log(user);
     //profile creation
     var profile = {
       username: user.username,
@@ -96,12 +95,10 @@ exports.login = async (req, res) => {
         error: "Invalid email or password",
       });
     }
-    console.log(user)
     //fetching profile
     var userProfile = null;
     if (user.role === "artist") userProfile = await fetchArtist(user._id);
     if (user.role === "buyer") userProfile = await fetchBuyer(user._id);
-    console.log(userProfile);
     createAndSendToken(userProfile, res);
   } catch (error) {
     res.status(404).json({
@@ -136,6 +133,7 @@ exports.protect = async (req, res, next) => {
     );
     //4- check if user exists in DB
     var user = await User.findById(userId);
+    console.log(userId);
     if (!user) {
       return res.status(401).json({
         status: "error",
