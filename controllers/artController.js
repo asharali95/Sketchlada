@@ -1,20 +1,39 @@
 const Art = require("../models/artModel");
 const APIFeatures = require("../utility/commonUtility");
+const multer = require("multer");
+const { v4: uuid } = require("uuid");
+const { shapeArtData } = require("../utility/arts");
+
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    // callback (error, destination)
+    callback(null, "public/images/");
+  },
+  filename: (req, file, callback) => {
+    var extension = file.mimetype.split("/")[1];
+    callback(
+      null,
+      `art-${req.user._id}-${
+        file.originalname.split(".")[0]
+      }-${uuid()}-${Date.now()}.${extension}`
+    );
+  },
+});
+
+exports.artUpload = multer({ storage: storage }).any();
 
 exports.addArt = async (req, res) => {
   try {
-    // req.body.artist = req.user._id;
-    // var art = await Art.create(req.body);
-    console.log(req.body)
+    var artData = shapeArtData(req);
+    var art = await Art.create(artData);
     res.status(200).json({
       status: "success",
       data: {
-        // art,
+        art,
       },
     });
   } catch (error) {
     res.status(404).json({
-      
       error: error.message,
     });
   }

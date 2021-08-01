@@ -14,7 +14,8 @@ const limiter = rateLimit({
 });
 
 const app = express();
-
+//serving static files
+app.use(express.static("public"));
 //middleware
 app.use(limiter);
 app.use(express.json());
