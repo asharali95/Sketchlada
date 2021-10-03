@@ -133,7 +133,6 @@ exports.protect = async (req, res, next) => {
     );
     //4- check if user exists in DB
     var user = await User.findById(userId);
-    console.log(userId);
     if (!user) {
       return res.status(401).json({
         status: "error",

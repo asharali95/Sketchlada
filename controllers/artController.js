@@ -3,33 +3,65 @@ const APIFeatures = require("../utility/commonUtility");
 const multer = require("multer");
 const { v4: uuid } = require("uuid");
 const { shapeArtData } = require("../utility/arts");
+const { awsImageUploader } = require("../utility/AWS");
 
-const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    // callback (error, destination)
-    callback(null, "public/images/");
-  },
-  filename: (req, file, callback) => {
-    var extension = file.mimetype.split("/")[1];
-    callback(
-      null,
-      `art-${req.user._id}-${
-        file.originalname.split(".")[0]
-      }-${uuid()}-${Date.now()}.${extension}`
-    );
-  },
-});
-
+// multer- memory storage! (buffer)
+var storage = multer.memoryStorage();
 exports.artUpload = multer({ storage: storage }).any();
+
+exports.processArtImages = async (req, res, next) => {
+  try {
+    // console.log(req.files);
+    var gallery = [];
+    var image = null;
+    var files = req.files;
+    for (var file of files) {
+      // bad for performance
+      var extension = file.mimetype.split("/")[1];
+      var fileName = `art-${req.user._id}-${
+        file.originalname.split(".")[0]
+      }-${uuid()}-${Date.now()}.${extension}`;
+      var { Location } = await awsImageUploader(file, fileName);
+      gallery.push(Location);
+    }
+    req.body.gallery = gallery;
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// multer - disk storage!
+// const storage = multer.diskStorage({
+//   destination: (req, file, callback) => {
+//     // callback (error, destination)
+//     callback(null, "public/images/");
+//   },
+//   filename: (req, file, callback) => {
+//     var extension = file.mimetype.split("/")[1];
+//     callback(
+//       null,
+//       `art-${req.user._id}-${
+//         file.originalname.split(".")[0]
+//       }-${uuid()}-${Date.now()}.${extension}`
+//     );
+//   },
+// });
+
+// exports.artUpload = multer({ storage: storage }).any();
 
 exports.addArt = async (req, res) => {
   try {
-    var artData = shapeArtData(req);
-    var art = await Art.create(artData);
+    console.log(req.body.gallery);
+    // var artData = shapeArtData(req);
+    // var art = await Art.create(artData);
+    // console.log(req.body);
+    // console.log(req.files);
     res.status(200).json({
       status: "success",
       data: {
-        art,
+        // art,
       },
     });
   } catch (error) {

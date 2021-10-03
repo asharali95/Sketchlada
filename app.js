@@ -21,7 +21,6 @@ app.use(limiter);
 app.use(express.json());
 app.use(mongoSanitize());
 app.use(xss());
-
 //routers
 app.use("/api/v1/arts", artRouter);
 app.use("/api/v1/auth", authRouter);
