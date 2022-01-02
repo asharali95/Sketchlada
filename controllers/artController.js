@@ -11,20 +11,30 @@ exports.artUpload = multer({ storage: storage }).any();
 
 exports.processArtImages = async (req, res, next) => {
   try {
-    // console.log(req.files);
     var gallery = [];
-    var image = null;
     var files = req.files;
-    for (var file of files) {
-      // bad for performance
+    var promises = files.map(async (file) => {
       var extension = file.mimetype.split("/")[1];
       var fileName = `art-${req.user._id}-${
         file.originalname.split(".")[0]
       }-${uuid()}-${Date.now()}.${extension}`;
       var { Location } = await awsImageUploader(file, fileName);
       gallery.push(Location);
-    }
+      if (file.fieldname === "coverphoto") req.body.coverPhoto = Location;
+    });
+    await Promise.all(promises);
+
+    // for (var file of files) {
+    //   // bad for performance
+    //   var extension = file.mimetype.split("/")[1];
+    //   var fileName = `art-${req.user._id}-${
+    //     file.originalname.split(".")[0]
+    //   }-${uuid()}-${Date.now()}.${extension}`;
+    //   var { Location } = await awsImageUploader(file, fileName);
+    //   gallery.push(Location);
+    // }
     req.body.gallery = gallery;
+
     next();
   } catch (error) {
     console.log(error);
@@ -53,15 +63,12 @@ exports.processArtImages = async (req, res, next) => {
 
 exports.addArt = async (req, res) => {
   try {
-    console.log(req.body.gallery);
-    // var artData = shapeArtData(req);
-    // var art = await Art.create(artData);
-    // console.log(req.body);
-    // console.log(req.files);
+    req.body.artist = req.user._id; // art belong to this artist
+    var art = await Art.create(req.body);
     res.status(200).json({
       status: "success",
       data: {
-        // art,
+        art,
       },
     });
   } catch (error) {

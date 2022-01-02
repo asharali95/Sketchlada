@@ -15,11 +15,16 @@ const artSchema = new mongoose.Schema(
     resolutionWidth: Number,
     resolutionHeight: Number,
     gallery: Array, //abc.com, xyz.com
+    coverPhoto: String,
     orientation: String, // landscape, portrait
     subject: String, //"nature"
     formats: Array, //[png","ai","psd"]
     likes: [ObjectId],
     likesCount: {
+      type: Number,
+      default: 0,
+    },
+    viewCount: {
       type: Number,
       default: 0,
     },
