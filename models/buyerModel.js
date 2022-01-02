@@ -25,6 +25,13 @@ const buyerSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       required: [true, "user id is required"],
     },
+    address: {
+      country: String,
+      city: String,
+      street: String,
+      state: String,
+      zipcode: String,
+    },
     //TODO:
     //address info
   },

@@ -25,6 +25,14 @@ const artistSchema = new mongoose.Schema(
       type: String,
       default: "artist",
     },
+    paypal: String,
+    address: {
+      country: String,
+      city: String,
+      street: String,
+      state: String,
+      zipcode: String,
+    },
     //TODO:
     //banking info
     //address info
