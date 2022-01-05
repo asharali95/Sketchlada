@@ -12,6 +12,6 @@ mongoose
     console.log("connected to mongoDB");
   });
 
-app.listen(8000, () => {
-  console.log("server running at 8000");
+app.listen(process.env.PORT, () => {
+  console.log(`server running at ${process.env.PORT}`);
 });
