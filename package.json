@@ -16,6 +16,22 @@
     "xss-clean": "^0.1.1"
   },
   "scripts": {
-    "dev-start": "nodemon server.js"
-  }
+    "dev-start": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "name": "sketchlada",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asharali95/Sketchlada.git"
+  },
+  "author": "ashar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asharali95/Sketchlada/issues"
+  },
+  "homepage": "https://github.com/asharali95/Sketchlada#readme",
+  "description": ""
 }
