@@ -22,12 +22,12 @@ const createAndSendToken = (user, res) => {
       Date.now() + parseInt(process.env.COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000
     ),
     secure: process.env.NODE_ENV === "development" ? false : true, // this will only valid for HTTPS connection
-    httpOnly: true, // transfer only in http/https protocols
+    httpOnly: process.env.NODE_ENV === "development" ? false : true, // transfer only in http/https protocols
   });
 
   res.status(200).json({
     status: "success",
-    token,
+    token: process.env.NODE_ENV === "development" ? token : null,
     data: {
       user,
     },
