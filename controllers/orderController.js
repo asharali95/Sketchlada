@@ -38,7 +38,7 @@ exports.generateCheckoutSession = async (req, res) => {
         session,
       },
     });
-    console.log(session);
+    // console.log(session);
   } catch (error) {
     res.status(400).json({ message: error });
   }
@@ -58,6 +58,7 @@ exports.stripeWebHook = (request, response) => {
   } catch (err) {
     response.status(400).send(`Webhook Error: ${err.message}`);
   }
+  console.log(event.type);
   if (event.type === "checkout.session.completed") {
     console.log("session checkout completed");
   }
