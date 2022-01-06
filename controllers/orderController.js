@@ -55,12 +55,11 @@ exports.stripeWebHook = (request, response) => {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-    console.log(event);
-    if (event.type === "checkout.session.completed") {
-      console.log("session checkout completed");
-    }
   } catch (err) {
     response.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  if (event.type === "checkout.session.completed") {
+    console.log("session checkout completed");
   }
 
   // Handle the event
