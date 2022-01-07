@@ -70,7 +70,9 @@ exports.stripeWebHook = async (request, response) => {
         },
       } = event;
       var order = await Order.create(metadata);
-      console.log(order);
+      //changing art status to sold
+      await Art.findByIdAndUpdate(metadata.art, { status: "sold" });
+      //TODO: save event.data.object details to transaction Collection
     }
     response.json({ received: true });
   } catch (err) {
