@@ -24,15 +24,16 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.static("public"));
 //middleware
 app.use(limiter);
-app.use(express.json());
-app.use(mongoSanitize());
-app.use(xss());
-// stripe
 app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
   stripeWebHook
 );
+app.use(express.json());
+app.use(mongoSanitize());
+app.use(xss());
+// stripe
+
 //routers
 app.use("/api/v1/arts", artRouter);
 app.use("/api/v1/auth", authRouter);
