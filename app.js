@@ -24,6 +24,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.static("public"));
 //middleware
 app.use(limiter);
+// stripe
 app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
@@ -32,7 +33,6 @@ app.post(
 app.use(express.json());
 app.use(mongoSanitize());
 app.use(xss());
-// stripe
 
 //routers
 app.use("/api/v1/arts", artRouter);
