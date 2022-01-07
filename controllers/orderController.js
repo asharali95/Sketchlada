@@ -51,7 +51,7 @@ exports.generateCheckoutSession = async (req, res) => {
   }
 };
 
-exports.stripeWebHook = (request, response) => {
+exports.stripeWebHook = async (request, response) => {
   const sig = request.headers["stripe-signature"];
 
   let event;
@@ -62,33 +62,17 @@ exports.stripeWebHook = (request, response) => {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
+    if (event.type === "checkout.session.completed") {
+      var {
+        data: {
+          object: { metadata },
+        },
+      } = event;
+      var order = await Ordr.create(metadata);
+      console.log(order);
+    }
+    response.json({ received: true });
   } catch (err) {
     response.status(400).send(`Webhook Error: ${err.message}`);
   }
-  if (event.type === "checkout.session.completed") {
-    var {
-      data: {
-        object: { metadata },
-      },
-    } = event;
-    console.log(metadata);
-  }
-
-  // Handle the event
-  // switch (event.type) {
-  //   case "payment_intent.succeeded":
-  //     const paymentIntent = event.data.object;
-  //     console.log("PaymentIntent was successful!");
-  //     break;
-  //   case "payment_method.attached":
-  //     const paymentMethod = event.data.object;
-  //     console.log("PaymentMethod was attached to a Customer!");
-  //     break;
-  //   // ... handle other event types
-  //   default:
-  //     console.log(`Unhandled event type ${event.type}`);
-  // }
-
-  // Return a response to acknowledge receipt of the event
-  response.json({ received: true });
 };
