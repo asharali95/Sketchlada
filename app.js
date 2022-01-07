@@ -28,7 +28,11 @@ app.use(express.json());
 app.use(mongoSanitize());
 app.use(xss());
 // stripe
-app.post("/stripe-webhook", bodyParser.raw({ type: "*/*" }), stripeWebHook);
+app.post(
+  "/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebHook
+);
 //routers
 app.use("/api/v1/arts", artRouter);
 app.use("/api/v1/auth", authRouter);
