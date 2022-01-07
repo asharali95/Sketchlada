@@ -1,4 +1,5 @@
 const Art = require("../models/artModel");
+const Order = require("../models/orderModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 exports.generateCheckoutSession = async (req, res) => {
   try {
@@ -68,7 +69,7 @@ exports.stripeWebHook = async (request, response) => {
           object: { metadata },
         },
       } = event;
-      var order = await Ordr.create(metadata);
+      var order = await Order.create(metadata);
       console.log(order);
     }
     response.json({ received: true });
