@@ -64,6 +64,7 @@ exports.processArtImages = async (req, res, next) => {
 exports.addArt = async (req, res) => {
   try {
     req.body.artist = req.user._id; // art belong to this artist
+    console.log(req.body);
     var art = await Art.create(req.body);
     res.status(200).json({
       status: "success",

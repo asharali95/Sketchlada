@@ -95,6 +95,7 @@ exports.login = async (req, res) => {
         error: "Invalid email or password",
       });
     }
+
     //fetching profile
     var userProfile = null;
     if (user.role === "artist") userProfile = await fetchArtist(user._id);
@@ -118,7 +119,6 @@ exports.protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-
     //2- if no token exists
     if (!token) {
       return res.status(401).json({

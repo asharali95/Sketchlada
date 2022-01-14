@@ -5,6 +5,8 @@ const artistRouter = require("./routes/artistRoutes");
 const buyerRouter = require("./routes/buyerRoutes");
 const orderRouter = require("./routes/orderRoutes");
 const notificationRouter = require("./routes/notificationRoute");
+const conversationRouter = require("./routes/conversationRoute");
+const messageRouter = require("./routes/messageRoute");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit"); //to resist brute force attack
 const mongoSanitize = require("express-mongo-sanitize"); // to resist noSQLQueryInjection
@@ -42,4 +44,6 @@ app.use("/api/v1/artists", artistRouter);
 app.use("/api/v1/buyers", buyerRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/conversations", conversationRouter);
+app.use("/api/v1/messages", messageRouter);
 module.exports = app;

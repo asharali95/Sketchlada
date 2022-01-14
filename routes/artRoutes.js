@@ -17,7 +17,7 @@ router.use("/:artId/reviews", reviewRouter);
 router
   .route("/")
   .get(getArts)
-  .post(protect, artUpload, processArtImages, addArt);
+  .post(protect, artUpload, processArtImages, restrictTo("artist"), addArt);
 router.route("/:artId").get(getSpecificArt);
 router.route("/:artId/like").post(protect, likeArt);
 router.route("/:artId/dislike").post(protect, dislikeArt);
