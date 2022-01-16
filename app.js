@@ -10,7 +10,6 @@ const messageRouter = require("./routes/messageRoute");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit"); //to resist brute force attack
 const mongoSanitize = require("express-mongo-sanitize"); // to resist noSQLQueryInjection
-const bodyParser = require("body-parser");
 var xss = require("xss-clean"); // for XSS attack (remove script tags)
 const { stripeWebHook } = require("./controllers/orderController");
 

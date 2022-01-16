@@ -11,6 +11,13 @@ exports.getMessage = (req, res) => {
 
 exports.fetchConversation = async (req, res) => {
   try {
+    //fetch convoId based on orderId and member
+    //--- fetch convo msgs
+    //--- return convo and messages
+    //if no convo found
+    //---create convo
+    //--- return convo and messages
+
     var { orderId } = req.params;
     var { conversationType } = req.body;
     var convo = await Conversation.findOne({
@@ -32,18 +39,24 @@ exports.fetchConversation = async (req, res) => {
     }
     var messages = await Message.find({
       conversationId: convo._id,
-      $or: [{ artist: req.user._id }, { buyer: req.user._id }],
+      $or: [{ sender: req.user._id }, { reciever: req.user._id }],
     });
     console.log(messages);
-    //fetch convoId based on orderId and member
-    //--- fetch convo msgs
-    //--- return convo and messages
-    //if no convo found
-    //---create convo
-    //--- return convo and messages
+
     res
       .status(200)
       .json({ status: "success", data: { conversation: convo, messages } });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.fetchConversations = async (req, res) => {
+  try {
+    var conversations = await Conversation.find({
+      members: req.user._id,
+    });
+    res.status(200).json({ status: "sucess", data: { conversations } });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
