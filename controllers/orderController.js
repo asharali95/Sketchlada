@@ -32,7 +32,7 @@ exports.generateCheckoutSession = async (req, res) => {
               images: [coverPhoto],
               description,
             },
-            unit_amount: cost,
+            unit_amount: cost * 100,
           },
           quantity: 1,
         },
