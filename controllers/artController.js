@@ -85,8 +85,8 @@ exports.getArts = async (req, res) => {
     var query = new APIFeatures(Art, { ...req.query, status: "active" })
       .filter()
       .sort()
-      .limitFields()
-      .paginate();
+      .limitFields();
+    // .paginate();
     //finding total number of pages
     var totalPages = Math.ceil((await Art.countDocuments()) / limit);
     //get
